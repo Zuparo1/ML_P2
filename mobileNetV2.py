@@ -25,7 +25,7 @@ optimizer = optim.Adam(model.classifier[1].parameters(), lr=0.001)
 #####################################################################################################
 
 train_model(model, train_loader, valid_loader, criterion, optimizer, epochs=10)
-save_model(model, "mushroom_mobilenetV2.pth.pth")
+save_model(model, "models/mushroom_mobilenetV2.pth")
 
 #pred
 image_path = "split_data/test/butter_cap/5.png"
