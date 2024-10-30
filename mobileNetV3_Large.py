@@ -8,8 +8,8 @@ from PIL import Image
 import os
 from utils import get_data_loaders, train_model, save_model, predict_image, device
 
-data_dir = "split_data"
-train_loader, valid_loader, class_names = get_data_loaders(data_dir)
+data_dir = "data"
+train_loader ,valid_loader, test_loader, class_names = get_data_loaders(data_dir)
 
 #####################################################################################################
 model = models.mobilenet_v3_large(pretrained=True)

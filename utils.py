@@ -1,31 +1,59 @@
 import time
 import torch
 from torchvision import datasets, transforms
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, random_split
 from PIL import Image
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 def get_data_loaders(data_dir, batch_size=32):
-    transform = transforms.Compose([
+    transformNormalized = transforms.Compose([
         transforms.Resize(224),
         transforms.CenterCrop(224),
         transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     ])
-    train_data = datasets.ImageFolder(root=f"{data_dir}/train", transform=transform)
-    valid_data = datasets.ImageFolder(root=f"{data_dir}/test", transform=transform)
+    transformTraining = transforms.Compose([
+        transforms.Resize(224),
+        transforms.CenterCrop(224),
+        transforms.RandomHorizontalFlip(),
+        #NEW
+        transforms.RandomRotation(20),
+        transforms.RandomAffine(degrees=15, translate=(0.1, 0.1), scale=(0.8, 1.2)),
+        transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1),
+        transforms.RandomPerspective(distortion_scale=0.2, p=0.5),
+        transforms.GaussianBlur(kernel_size=(5, 9), sigma=(0.1, 5)),
+        #NEW
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+    ])
+    ##train_data = datasets.ImageFolder(root=f"{data_dir}/train", transform=transformTraining)
+   ## valid_data = datasets.ImageFolder(root=f"{data_dir}/test", transform=transformNormalized)
+    full_dataset = datasets.ImageFolder(root=data_dir, transform=transformTraining)
 
-    train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
-    valid_loader = DataLoader(valid_data, batch_size=batch_size, shuffle=False)
+    # Calculate lengths for each subset (80/10/10 split)
+    train_size = int(0.8 * len(full_dataset))
+    val_size = int(0.1 * len(full_dataset))
+    test_size = len(full_dataset) - train_size - val_size
 
-    class_names = train_data.classes
-    print(f"Number of training images: {len(train_data)}")
-    print(f"Number of validation images: {len(valid_data)}")
+    # Split the dataset into train, validation, and test sets
+    train_dataset, val_dataset, test_dataset = random_split(full_dataset, [train_size, val_size, test_size])
+
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
+    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
+
+   # train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
+    #valid_loader = DataLoader(valid_data, batch_size=batch_size, shuffle=False)
+
+    class_names = full_dataset.classes
+    print(f"Number of training images: {len(train_dataset)}")
+    print(f"Number of validation images: {len(val_dataset)}")
+    print(f"Number of test images: {len(test_dataset)}")
     print(f"Class names: {class_names}")
 
-    return train_loader, valid_loader, class_names
+    return train_loader, val_loader,test_loader, class_names
 
 
 def train_model(model, train_loader, valid_loader, criterion, optimizer, epochs=10):
