@@ -6,7 +6,7 @@ from torch.utils.data import DataLoader
 import torch.optim as optim
 from PIL import Image
 import os
-from utils import get_data_loaders, train_model, save_model, predict_image, device
+from utils import get_data_loaders, train_model, save_model, predict_image, device, evaluate_model
 
 data_dir = "data"
 train_loader ,valid_loader, test_loader, class_names = get_data_loaders(data_dir)
@@ -24,8 +24,10 @@ optimizer = optim.Adam(model.classifier[3].parameters(), lr=0.001) #Lower learin
 #####################################################################################################
 
 train_model(model, train_loader, valid_loader, criterion, optimizer, epochs=10)
+
+evaluate_model(model, test_loader)
+
 save_model(model, "models/mushroom_mobilenetV3_Large.pth")
 #pred
-image_path = "split_data/test/butter_cap/5.png"
-prediction = predict_image(model, image_path, train_loader.dataset.transform, class_names)
-print("Predicted class:", prediction)
+
+

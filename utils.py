@@ -19,11 +19,7 @@ def get_data_loaders(data_dir, batch_size=32):
         transforms.CenterCrop(224),
         transforms.RandomHorizontalFlip(),
         #NEW
-        transforms.RandomRotation(20),
-        transforms.RandomAffine(degrees=15, translate=(0.1, 0.1), scale=(0.8, 1.2)),
-        transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1),
-        transforms.RandomPerspective(distortion_scale=0.2, p=0.5),
-        transforms.GaussianBlur(kernel_size=(5, 9), sigma=(0.1, 5)),
+      #  transforms.RandomRotation(20),
         #NEW
         transforms.ToTensor(),
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
@@ -88,6 +84,19 @@ def train_model(model, train_loader, valid_loader, criterion, optimizer, epochs=
 
     end_time = time.perf_counter()
     print(f"Elapsed time: {end_time - start_time} seconds")
+
+def evaluate_model(model, test_loader):
+    model.eval()
+    test_accuracy = 0
+    with torch.no_grad():
+        for inputs, labels in test_loader:
+            inputs, labels = inputs.to(device), labels.to(device)
+            outputs = model(inputs)
+            _, preds = torch.max(outputs, 1)
+            test_accuracy += torch.sum(preds == labels).item()
+    accuracy = test_accuracy / len(test_loader.dataset)
+    print(f"Test Accuracy: {accuracy:.4f}")
+    return accuracy
 
 
 def save_model(model, file_path):
