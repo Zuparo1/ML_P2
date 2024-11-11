@@ -25,7 +25,7 @@ def get_data_loaders(data_dir, batch_size=32):
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     ])
     ##train_data = datasets.ImageFolder(root=f"{data_dir}/train", transform=transformTraining)
-   ## valid_data = datasets.ImageFolder(root=f"{data_dir}/test", transform=transformNormalized)
+    ##valid_data = datasets.ImageFolder(root=f"{data_dir}/test", transform=transformNormalized)
     full_dataset = datasets.ImageFolder(root=data_dir, transform=transformTraining)
 
     # Calculate lengths for each subset (80/10/10 split)
@@ -36,12 +36,10 @@ def get_data_loaders(data_dir, batch_size=32):
     # Split the dataset into train, validation, and test sets
     train_dataset, val_dataset, test_dataset = random_split(full_dataset, [train_size, val_size, test_size])
 
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, )
     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
-
-   # train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
-    #valid_loader = DataLoader(valid_data, batch_size=batch_size, shuffle=False)
 
     class_names = full_dataset.classes
     print(f"Number of training images: {len(train_dataset)}")
