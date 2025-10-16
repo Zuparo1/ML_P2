@@ -2,8 +2,8 @@
 
 Train and compare several popular CNN architectures on an image classification task. This repo includes ready-to-run training scripts for **ResNet18/ResNet50, EfficientNet, MobileNetV2, MobileNetV3 (Small/Large)** and common utilities.
 
-## Report 
-adf
+## Paper 
+[Final Report](./Final_Report.pdf)
 
 ## Highlights
 - 🔁 Comparable training loops across architectures
